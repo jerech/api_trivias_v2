@@ -12,7 +12,7 @@
 		const DB_SERVER = "localhost";
 		const DB_USER = "ubeed";
 		const DB_PASSWORD = "20ubeed16";
-		const DB = "triviaubeed";
+		const DB = "triviaubeed_v2";
 		
 		private $db = NULL;
 		private $url_server="http://93.188.166.57/";
