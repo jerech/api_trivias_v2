@@ -258,6 +258,17 @@
 					$id_user=$row['id'];
 					$voucher =$row['voucher'];
 					$puntos = $row['puntos_acumulados']; 
+
+					//Puntos en la semana
+					$previous_week = strtotime("+1 day");
+					$start_week = strtotime("last sunday midnight",$previous_week);
+					$start_week = date("Y-m-d",$start_week);
+
+					$sql="select sum(puntos) as puntos_semanales from detalle_puntos where usuario_id=$id_user 
+							and fecha_creacion>'$start_week'";
+					$result=mysql_query($sql,$this->db);
+					$puntos_semanales = mysql_fetch_assoc($result)['puntos_semanales'];
+
 				}else{
 					$response = array('success' => 'false', 'msg' => 'Error. El usuario no existe.');
 					$this->response(json_encode($response), 200);
@@ -280,6 +291,7 @@
 				    order by fecha_actualizacion desc ";
 				$result=mysql_query($sql,$this->db);
 				if($result){
+					$array_oponentes = array();
 					while ($array = mysql_fetch_array($result, MYSQL_ASSOC)) {
 						
 						$nombre1 = $array['nombre1'];
@@ -311,13 +323,15 @@
 								where usuario_id=$id2 and duelo_id=$id_duelo";
 						$result3=mysql_query($sql,$this->db);
 						
-
+						$id_oponente = 0;
 						if($id_user!=$id1){
+							$id_oponente = $id1;
 							$respuestas = mysql_num_rows($result3);
 							$respuestas_oponente = mysql_num_rows($result2);
 							$nombre = $nombre1;
 							$imagen = $imagen1;
 						}else{
+							$id_oponente = $id2;
 							$respuestas = mysql_num_rows($result2);
 							$respuestas_oponente = mysql_num_rows($result3);
 							$nombre = $nombre2;
@@ -332,8 +346,34 @@
 										'fecha_actualizacion'=>$fecha_actualizacion,
 										'email_turno'=>$email_turno,
 										'duelo_id'=>$duelo_id);
+
+						$array_oponentes[] = $id_oponente;
 						if($terminado==1){
-							$array_partidas_terminadas[]=$datos;
+
+							if(in_array($id_oponente, $array_oponentes)==false){
+
+									$sql="SELECT count(usuario_id_ganador) as ganados FROM `duelo` 
+									       WHERE (usuario1_id=$id_user or usuario2_id=$id_user) 
+									       		  and (usuario1_id=$id_oponente or usuario2_id=$id_oponente) 
+									              and terminado=1 and usuario_id_ganador=$id_user";
+									$result = mysql_query($sql);
+									$canGanados = mysql_fetch_assoc($result)['ganados'];
+
+									$sql="SELECT count(usuario_id_ganador) as perdidos FROM `duelo` 
+									       WHERE (usuario1_id=$id_user or usuario2_id=$id_user) 
+									       		  and (usuario1_id=$id_oponente or usuario2_id=$id_oponente) 
+									              and terminado=1 and usuario_id_ganador=$id_oponente";
+									$result = mysql_query($sql);
+									$canPerdidos = mysql_fetch_assoc($result)['perdidos'];
+
+									$partida_ter  = array('duelo_id' => $duelo_id,
+													'fecha_actualizacion' => $fecha_actualizacion,
+													'imagen_oponente' => $imagen,
+													'nombre_oponente' => $nombre_oponente,
+													'ganados' => $ganados,
+													'perdidos' => $perdidos);
+								$array_partidas_terminadas[]=$partida_ter;
+							}
 						}else{
 							$array_partidas_iniciadas[]=$datos;
 						}
@@ -350,6 +390,7 @@
 					//Agregamos los otros datos que faltan a la respuesta
 					$response = array('success' => 'true', 'msg' => 'Datos obtenidos correctamente',
 										'puntos'=> $puntos, 'voucher'=>$voucher,
+										'puntos_semanales' => $puntos_semanales,
 										'partidas_iniciadas'=>$array_partidas_iniciadas,
 										'partidas_terminadas'=>$array_partidas_terminadas);
 					$this->response(json_encode($response), 200);
