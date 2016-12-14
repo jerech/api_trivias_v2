@@ -348,11 +348,11 @@
 										'email_turno'=>$email_turno,
 										'duelo_id'=>$duelo_id);
 
-						$array_oponentes[] = $id_oponente;
+						
 						if($terminado==1){
 
 							if(in_array($id_oponente, $array_oponentes)!=1){
-
+									$array_oponentes[] = $id_oponente;
 									$sql="SELECT count(usuario_id_ganador) as ganados FROM `duelo` 
 									       WHERE (usuario1_id=$id_user or usuario2_id=$id_user) 
 									       		  and (usuario1_id=$id_oponente or usuario2_id=$id_oponente) 
