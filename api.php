@@ -268,6 +268,7 @@
 							and fecha_creacion>'$start_week'";
 					$result=mysql_query($sql,$this->db);
 					$puntos_semanales = mysql_fetch_assoc($result)['puntos_semanales'];
+					$puntos_semanales = is_null($puntos_semanales)==true?0:$puntos_semanales;
 
 				}else{
 					$response = array('success' => 'false', 'msg' => 'Error. El usuario no existe.');
@@ -350,7 +351,7 @@
 						$array_oponentes[] = $id_oponente;
 						if($terminado==1){
 
-							if(in_array($id_oponente, $array_oponentes)==false){
+							if(in_array($id_oponente, $array_oponentes)!=1){
 
 									$sql="SELECT count(usuario_id_ganador) as ganados FROM `duelo` 
 									       WHERE (usuario1_id=$id_user or usuario2_id=$id_user) 
@@ -370,8 +371,8 @@
 													'fecha_actualizacion' => $fecha_actualizacion,
 													'imagen_oponente' => $imagen,
 													'nombre_oponente' => $nombre_oponente,
-													'ganados' => $ganados,
-													'perdidos' => $perdidos);
+													'ganados' => $canPerdidos,
+													'perdidos' => $canGanados);
 								$array_partidas_terminadas[]=$partida_ter;
 							}
 						}else{
