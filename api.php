@@ -372,7 +372,8 @@
 													'imagen_oponente' => $imagen,
 													'nombre_oponente' => $nombre,
 													'ganados' => $canPerdidos,
-													'perdidos' => $canGanados);
+													'perdidos' => $canGanados,
+													'id_oponente' => $id_oponente);
 								$array_partidas_terminadas[]=$partida_ter;
 							}
 						}else{
