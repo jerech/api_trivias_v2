@@ -370,7 +370,7 @@
 									$partida_ter  = array('duelo_id' => $duelo_id,
 													'fecha_actualizacion' => $fecha_actualizacion,
 													'imagen_oponente' => $imagen,
-													'nombre_oponente' => $nombre_oponente,
+													'nombre_oponente' => $nombre,
 													'ganados' => $canPerdidos,
 													'perdidos' => $canGanados);
 								$array_partidas_terminadas[]=$partida_ter;
