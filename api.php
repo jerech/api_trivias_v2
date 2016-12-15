@@ -242,6 +242,90 @@
 			$this->response(json_encode($response), 200);
 		}
 
+
+		public function get_datos_configuracion(){
+			$email = $this->_request['email'];
+
+			$array_partidas_iniciadas = array();
+			$array_partidas_terminadas = array();
+
+			//Comprobamos si el usuario existe
+			$sql="select * from usuario where email='$email'";
+			$result=mysql_query($sql,$this->db);
+			if($result){
+				$count=mysql_num_rows($result);
+				if($count>0){
+					$row=mysql_fetch_assoc($result);
+					$id_user=$row['id'];
+					$voucher =$row['voucher'];
+					$puntos = $row['puntos_acumulados']; 
+
+					//Puntos en la semana
+					$previous_week = strtotime("+1 day");
+					$start_week = strtotime("last sunday midnight",$previous_week);
+					$start_week = date("Y-m-d",$start_week);
+
+					$sql="select sum(puntos) as puntos_semanales from detalle_puntos where usuario_id=$id_user 
+							and fecha_creacion>'$start_week'";
+					$result=mysql_query($sql,$this->db);
+					$puntos_semanales = mysql_fetch_assoc($result)['puntos_semanales'];
+					$puntos_semanales = is_null($puntos_semanales)==true?0:$puntos_semanales;
+
+
+					$fecha_mes = date("Y-m")."-01";
+					$sql="select *, sum(puntos) as sum_puntos from detalle_puntos where 
+							fecha_creacion>'$fecha_mes' group by usuario_id order by sum_puntos desc";
+					$result=mysql_query($sql,$this->db);
+					$ranking =1;
+					while ($array =  mysql_fetch_array($result, MYSQL_ASSOC) ) {
+						
+						if($array['usuario_id']=$id_user){
+							break;
+						}
+						$ranking++;
+					}
+
+					$sql = "select * from respuesta where usuario_id = $id_user and correcta=1";
+					$result = mysql_query($sql, $this->db);
+					$canCorrectas = mysql_num_rows($result);
+
+					$sql = "select * from respuesta where usuario_id = $id_user and correcta=0";
+					$result = mysql_query($sql, $this->db);
+					$canIncorrectas = mysql_num_rows($result);
+
+					$sql = "select * from duelo where usuario_id_ganador = $id_user and terminado=1";
+					$result = mysql_query($sql, $this->db);
+					$canGanados = mysql_num_rows($result);
+
+					$sql = "select * from duelo where usuario_id_ganador != $id_user and terminado=1";
+					$result = mysql_query($sql, $this->db);
+					$canPerdidos = mysql_num_rows($result);
+
+
+					$response = array('success' => 'true', 'msg' => '',
+									'puntos'=> $puntos,
+									'puntos_semanales'=> $puntos_semanales,
+									'ranking' => $ranking,
+									'correctas'=>is_null($canCorrectas)==true?0:$canCorrectas,
+									'incorrectas' => is_null($canIncorrectas)==true?0:$canIncorrectas,
+									'ganados' => is_null($canGanados)==true?0:$canGanados,
+									'perdidos' => is_null($canPerdidos)==true?0:$canPerdidos);
+					$this->response(json_encode($response), 200);
+
+				}else{
+					$response = array('success' => 'false', 'msg' => 'Error. El usuario no existe.');
+					$this->response(json_encode($response), 200);
+				}
+
+
+
+			}
+
+			$response = array('success' => 'false', 'msg' => 'Error. El usuario no existe.');
+					$this->response(json_encode($response), 200);
+
+		}
+
 		public function get_datos_home(){
 			$email = $this->_request['email'];
 
@@ -881,6 +965,10 @@
         	$row=mysql_fetch_assoc($result);
         	if($row['correcta']==true){
 
+        		$sql="insert into respuesta(usuario_id, trivia_id, fecha_creacion, correcta) 
+        					values($idUsuario, $idTrivia, '$fecha', 1)";
+        		mysql_query($sql,$this->db);	
+
         		//Sumamos 1 punto al usuario si el duelo es 0
         		if($idDuelo==0){
         			$sql="update usuario set puntos_acumulados = (puntos_acumulados+1) where email='$email' ";
@@ -923,7 +1011,9 @@
         		$response = array('success' => 'true', 'msg' => 'Respuesta correcta!','respuesta'=>'true');
 				$this->response(json_encode($response), 200);
         	}else{
-
+        		$sql="insert into respuesta(usuario_id, trivia_id, fecha_creacion, correcta) 
+        					values($idUsuario, $idTrivia, '$fecha', 0)";
+        		mysql_query($sql,$this->db);
         		if($idDuelo!=0){
 
 	        		//Si la respuesta es incorrecta, le pasamos el turno al otro usuario
