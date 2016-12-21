@@ -373,7 +373,7 @@
 				    left join usuario as u2 on u2.id=d.usuario2_id 
 				    left join usuario as u3 on u3.id=d.usuario_id_turno
 				    where d.activo=1 and (d.usuario1_id=$id_user or d.usuario2_id=$id_user) 
-				    order by fecha_actualizacion desc ";
+				    order by fecha_actualizacion asc ";
 				$result=mysql_query($sql,$this->db);
 				if($result){
 					$array_oponentes = array();
