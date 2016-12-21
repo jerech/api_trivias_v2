@@ -1077,19 +1077,20 @@
 		$count = mysql_num_rows($result);
 		$index = rand(0, ($count-1));
 
-			
-		$datos = array();
-		while ($array = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		$array = mysql_fetch_array($result, MYSQL_ASSOC)[$index];
 
-			$datos[]  = array('id' => $array['id'], 
+			
+
+
+	   $datos  = array('id' => $array['id'], 
 	    						'nombre'=>$array['nombre'],
 	    						'puntos'=>$array['puntos'],
 	    						'opciones'=>$this->get_question_option($array['id']),
 	    						'categoria'=>$categoria);
 
-		}
+		
 
-		$response = array('success' => 'true', 'msg' => 'Se obtuvieron preguntas', 'trivia'=>$datos[$index]);
+		$response = array('success' => 'true', 'msg' => 'Se obtuvieron preguntas', 'trivia'=>$datos);
 		$this->response(json_encode($response), 200);
 
 
@@ -1098,6 +1099,7 @@
 	private function get_question_option($trivia_id){
 
 		$sql="select * from opcion_trivia
+				INNER JOIN (SELECT RAND()*(SELECT MAX(ID) FROM opcion_trivia) AS ID) AS t ON opcion_trivia.id >= t.ID
 				where trivia_id=".$trivia_id;
 		$result=mysql_query($sql,$this->db);
 			
@@ -1107,6 +1109,8 @@
 							'descripcion' => $array['descripcion'],
 							'correcta'=> $array['correcta']);
 		}
+
+		shuffle($datos);
 
 		return $datos;
 
