@@ -1077,7 +1077,7 @@
 		$count = mysql_num_rows($result);
 		$index = rand(0, ($count-1));
 
-		$array = mysql_fetch_array($result, MYSQL_ASSOC)[$index];
+		$array = $result[$index];
 
 			
 
