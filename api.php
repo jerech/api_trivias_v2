@@ -979,11 +979,11 @@
 
         		}else{
 
-        			$sql="select * from detalle_puntos where duelo_id=$idDuelo";
+        			$sql="select * from detalle_puntos where duelo_id=$idDuelo and usuario_id=$idUsuario";
         			$result=mysql_query($sql,$this->db);
         			$numDetalles=mysql_num_rows($result);
         			if($numDetalles==9){
-        				$sql="update usuario set puntos_acumulados = (puntos_acumulados+25) where email='$email' ";
+        				$sql="update usuario set puntos_acumulados = (puntos_acumulados+10) where email='$email' ";
         				mysql_query($sql,$this->db);
 						$sql="insert into detalle_puntos(usuario_id, puntos, fecha_creacion, trivia_id, duelo_id)
         					values($idUsuario, 10, '$fecha', $idTrivia, $idDuelo)";
