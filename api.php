@@ -373,7 +373,7 @@
 				    left join usuario as u2 on u2.id=d.usuario2_id 
 				    left join usuario as u3 on u3.id=d.usuario_id_turno
 				    where d.activo=1 and (d.usuario1_id=$id_user or d.usuario2_id=$id_user) 
-				    order by fecha_actualizacion asc ";
+				    order by fecha_actualizacion desc ";
 				$result=mysql_query($sql,$this->db);
 				if($result){
 					$array_oponentes = array();
@@ -441,15 +441,15 @@
 									       WHERE (usuario1_id=$id_user or usuario2_id=$id_user) 
 									       		  and (usuario1_id=$id_oponente or usuario2_id=$id_oponente) 
 									              and terminado=1 and usuario_id_ganador=$id_user";
-									$result = mysql_query($sql);
-									$canGanados = mysql_fetch_assoc($result)['ganados'];
+									$resultGanadas = mysql_query($sql);
+									$canGanados = mysql_fetch_assoc($resultGanadas)['ganados'];
 
 									$sql="SELECT count(usuario_id_ganador) as perdidos FROM `duelo` 
 									       WHERE (usuario1_id=$id_user or usuario2_id=$id_user) 
 									       		  and (usuario1_id=$id_oponente or usuario2_id=$id_oponente) 
 									              and terminado=1 and usuario_id_ganador=$id_oponente";
-									$result = mysql_query($sql);
-									$canPerdidos = mysql_fetch_assoc($result)['perdidos'];
+									$resultGanadas = mysql_query($sql);
+									$canPerdidos = mysql_fetch_assoc($resultGanadas)['perdidos'];
 
 									$partida_ter  = array('duelo_id' => $duelo_id,
 													'fecha_actualizacion' => $fecha_actualizacion,
