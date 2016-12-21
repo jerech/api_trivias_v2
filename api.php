@@ -1,6 +1,6 @@
 <?php
     
-	error_reporting(0);
+	error_reporting(E_ALL);
 	require_once("Rest.inc.php");
 	require_once("GCMPushMessage.php");
 	
@@ -982,17 +982,17 @@
         			$sql="select * from detalle_puntos where duelo_id=$idDuelo";
         			$result=mysql_query($sql,$this->db);
         			$numDetalles=mysql_num_rows($result);
-        			if($numDetalles==19){
+        			if($numDetalles==9){
         				$sql="update usuario set puntos_acumulados = (puntos_acumulados+25) where email='$email' ";
         				mysql_query($sql,$this->db);
 						$sql="insert into detalle_puntos(usuario_id, puntos, fecha_creacion, trivia_id, duelo_id)
-        					values($idUsuario, 25, '$fecha', $idTrivia, $idDuelo)";
+        					values($idUsuario, 10, '$fecha', $idTrivia, $idDuelo)";
         				mysql_query($sql,$this->db);
 
         				$sql="update duelo set fecha_actualizacion='$fecha', terminado=1, usuario_id_ganador=$idUsuario where id=$idDuelo";
         				mysql_query($sql,$this->db);
 
-        			}else if($numDetalles<19){
+        			}else if($numDetalles<9){
         				$sql="insert into detalle_puntos(usuario_id, puntos, fecha_creacion, trivia_id, duelo_id)
         					values($idUsuario, 0, '$fecha', $idTrivia, $idDuelo)";
         				mysql_query($sql,$this->db);
