@@ -1077,11 +1077,14 @@
 		$count = mysql_num_rows($result);
 		$index = rand(0, ($count-1));
 
-		var_dump(mysql_free_result($result));
-		exit();
 
-		$array = mysql_fetch_array($result)[$index];
+		$arrayTotal = array();
+		while ($arrayTemp = mysql_fetch_array($result, MYSQL_ASSOC)) {
+			$arrayTotal[] = $arrayTemp;
 
+		}
+
+		$array=$arrayTotal[$index];
 			
 
 
