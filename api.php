@@ -1099,7 +1099,6 @@
 	private function get_question_option($trivia_id){
 
 		$sql="select * from opcion_trivia
-				INNER JOIN (SELECT RAND()*(SELECT MAX(ID) FROM opcion_trivia) AS ID) AS t ON opcion_trivia.id >= t.ID
 				where trivia_id=".$trivia_id;
 		$result=mysql_query($sql,$this->db);
 			
