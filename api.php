@@ -1008,7 +1008,7 @@
         		
         		
 
-        		$response = array('success' => 'true', 'msg' => 'Respuesta correcta!','respuesta'=>'true');
+        		$response = array('success' => 'true', 'msg' => 'Respuesta correcta!','respuesta'=>'true', 'opcion_correcta'=>$idOption);
 				$this->response(json_encode($response), 200);
         	}else{
         		$sql="insert into respuesta(usuario_id, trivia_id, fecha_creacion, correcta) 
@@ -1052,7 +1052,12 @@
 
 
         		}
-        		$response = array('success' => 'true', 'msg' => 'Respuesta incorrecta!', 'respuesta'=>'false');
+
+        		$sql="select * from opcion_trivia where trivia_id=".$idTrivia." and correcta=true";
+
+    			$result=mysql_query($sql,$this->db);
+        		$row=mysql_fetch_assoc($result);
+        		$response = array('success' => 'true', 'msg' => 'Respuesta incorrecta!', 'respuesta'=>'false','opcion_correcta'=>$row['id']);
 				$this->response(json_encode($response), 200);
         	}
 
